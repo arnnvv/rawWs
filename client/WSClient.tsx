@@ -16,7 +16,10 @@ const WSClient: FC = (): JSX.Element => {
     webSocket.current = new WebSocket("ws://localhost:8080");
 
     webSocket.current.onmessage = (event: MessageEvent) => {
-      setMessages((prevMessages: string[]) => [...prevMessages, event.data]);
+      setMessages((prevMessages: string[]): string[] => [
+        ...prevMessages,
+        event.data,
+      ]);
     };
 
     return () => {
