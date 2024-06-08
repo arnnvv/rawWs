@@ -19,7 +19,7 @@ const WSClient: FC = (): JSX.Element => {
 
     webSocket.current.onopen = () => {
       const urlParams = new URLSearchParams(window.location.search);
-      const roomId = urlParams.get("roomId");
+      const roomId = urlParams.get("roomid");
 
       webSocket.current?.send(
         JSON.stringify({

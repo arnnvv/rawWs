@@ -21,12 +21,15 @@ wss.on("connection", (ws: WebSocket) => {
   ws.on("message", (message: RawData) => {
     const data = JSON.parse(message.toString());
     if (data.type === "join") {
+      console.log(data.payload.roomId);
       users[id] = {
         roomId: data.payload.roomId,
         ws,
       };
     }
     if (data.type === "message") {
+      console.log(data.payload.message);
+
       const roomId = users[id].roomId;
       for (const userId in users) {
         if (users[userId].roomId === roomId) {
@@ -39,8 +42,6 @@ wss.on("connection", (ws: WebSocket) => {
         }
       }
     }
-    console.log("received: %s", message);
-    ws.send(`Hello, you sent -> ${message}`);
   });
 });
 
