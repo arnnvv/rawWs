@@ -19,8 +19,38 @@ class RedisManager {
     this.subscriptions = new Map<string, string[]>();
     this.reverseSubscriptions = new Map<
       string,
-      { [userId: string]: { userId: string; ws: WebSocket } }
+      {
+        [userId: string]: {
+          userId: string;
+          ws: WebSocket;
+        };
+      }
     >();
+  }
+
+  static getInstance(): RedisManager {
+    if (!RedisManager.instance) {
+      RedisManager.instance = new RedisManager();
+    }
+    return RedisManager.instance;
+  }
+
+  subscribe(userId: string, roomId: string, ws: WebSocket) {}
+
+  unsubscribe(userId: string, roomId: string, ws: WebSocket) {}
+
+  publish(room: string, message: any) {
+    console.log(`publishing message to ${room}`);
+    this.publisher.publish(room, JSON.stringify(message));
+  }
+
+  addChatMessage(roomId: string, message: any) {
+    this.publish(roomId, {
+      type: "message",
+      payload: {
+        message,
+      },
+    });
   }
 }
 
