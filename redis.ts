@@ -35,7 +35,7 @@ class RedisManager {
     return this.instance;
   }
 
-  subscribe(userId: string, roomId: string, ws: WebSocket) {
+  subscribe(userId: string, roomId: string, ws: WebSocket): void {
     this.subscriptions.set(userId, [
       ...(this.subscriptions.get(userId) || []),
       roomId,
@@ -50,11 +50,14 @@ class RedisManager {
       Object.keys(this.reverseSubscriptions.get(roomId) || {})?.length === 1
     ) {
       console.log(`subscribing message from ${roomId}`);
-      this.subscriber.subscribe(roomId, (payload) => {
+      this.subscriber.subscribe(roomId, (payload): void => {
         try {
           // const parsedPayload = JSON.parse(payload);
           const subscribers = this.reverseSubscriptions.get(roomId) || {};
-          Object.values(subscribers).forEach(({ ws }) => ws.send(payload));
+          Object.values(subscribers).forEach(
+            ({ ws }: { userId: string; ws: WebSocket }): void =>
+              ws.send(payload),
+          );
         } catch (e) {
           console.error("erroneous payload found?", e);
         }
@@ -62,18 +65,33 @@ class RedisManager {
     }
   }
 
-  unsubscribe(userId: string, roomId: string, ws: WebSocket) {
-    this.subscriptions.set(userId, [
-      ...(this.subscriptions.get(userId) || []).filter(),
-    ]);
+  unsubscribe(userId: string, roomId: string) {
+    this.subscriptions.set(
+      userId,
+      this.subscriptions
+        .get(userId)
+        ?.filter((x: string): boolean => x !== roomId) || [],
+    );
+    if (this.subscriptions.get(userId)?.length === 0) {
+      this.subscriptions.delete(userId);
+    }
+    delete this.reverseSubscriptions.get(roomId)?.[userId];
+    if (
+      !this.reverseSubscriptions.get(roomId) ||
+      Object.keys(this.reverseSubscriptions.get(roomId) || {}).length === 0
+    ) {
+      console.log("unsubscribing from " + roomId);
+      this.subscriber.unsubscribe(roomId);
+      this.reverseSubscriptions.delete(roomId);
+    }
   }
 
-  publish(room: string, message: any) {
+  publish(room: string, message: any): void {
     console.log(`publishing message to ${room}`);
     this.publisher.publish(room, JSON.stringify(message));
   }
 
-  addChatMessage(roomId: string, message: any) {
+  addChatMessage(roomId: string, message: any): void {
     this.publish(roomId, {
       type: "message",
       payload: {
