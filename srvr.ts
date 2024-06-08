@@ -9,7 +9,7 @@ const wss = new WebSocketServer({ server });
 
 const users: {
   [key: string]: {
-    room: string;
+    roomId: string;
     ws: WebSocket;
   };
 } = {};
@@ -22,14 +22,14 @@ wss.on("connection", (ws: WebSocket) => {
     const data = JSON.parse(message.toString());
     if (data.type === "join") {
       users[id] = {
-        room: data.payload.room,
+        roomId: data.payload.roomId,
         ws,
       };
     }
     if (data.type === "message") {
-      const roomId = users[id].room;
+      const roomId = users[id].roomId;
       for (const userId in users) {
-        if (users[userId].room === roomId) {
+        if (users[userId].roomId === roomId) {
           users[userId].ws.send(
             JSON.stringify({
               type: "message",

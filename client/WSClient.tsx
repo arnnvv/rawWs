@@ -5,21 +5,40 @@ import React, {
   ChangeEvent,
   KeyboardEvent,
   FC,
+  MutableRefObject,
 } from "react";
 
 const WSClient: FC = (): JSX.Element => {
   const [message, setMessage] = useState<string>("");
   const [messages, setMessages] = useState<string[]>([]);
-  const webSocket = useRef<WebSocket | null>(null);
+  const webSocket: MutableRefObject<WebSocket | null> =
+    useRef<WebSocket | null>(null);
 
   useEffect(() => {
     webSocket.current = new WebSocket("ws://localhost:8080");
 
+    webSocket.current.onopen = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const roomId = urlParams.get("roomId");
+
+      webSocket.current?.send(
+        JSON.stringify({
+          type: "join",
+          payload: {
+            roomId,
+          },
+        }),
+      );
+    };
+
     webSocket.current.onmessage = (event: MessageEvent) => {
-      setMessages((prevMessages: string[]): string[] => [
-        ...prevMessages,
-        event.data,
-      ]);
+      const data = JSON.parse(event.data);
+      if (data.type === "message") {
+        setMessages((prevMessages: string[]): string[] => [
+          ...prevMessages,
+          event.data,
+        ]);
+      }
     };
 
     return () => {
@@ -31,7 +50,14 @@ const WSClient: FC = (): JSX.Element => {
 
   const sendMessage = () => {
     if (webSocket.current && message) {
-      webSocket.current.send(message);
+      webSocket.current.send(
+        JSON.stringify({
+          type: "message",
+          payload: {
+            message,
+          },
+        }),
+      );
       setMessage("");
     }
   };
