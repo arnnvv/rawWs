@@ -73,7 +73,7 @@ class RedisManager {
               ws.send(payload),
           );
         } catch (e) {
-          console.error("erroneous payload found?", e);
+          console.error(`erroneous payload found: ${e}`);
         }
       });
     }
@@ -107,7 +107,7 @@ class RedisManager {
     this.publisher.publish(room, JSON.stringify(message));
   }
 
-  async addChatMessage(roomId: string, message: RawData): Promise<void> {
+  addChatMessage(roomId: string, message: RawData): void {
     this.publish(roomId, {
       type: "message",
       payload: {

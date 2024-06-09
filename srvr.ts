@@ -15,7 +15,7 @@ const users: {
 
 let count: number = 0;
 
-wss.on("connection", async (ws: WebSocket): Promise<void> => {
+wss.on("connection", (ws: WebSocket): void => {
   const id = count++;
   ws.on("message", (message: RawData): void => {
     const data = JSON.parse(message.toString());
