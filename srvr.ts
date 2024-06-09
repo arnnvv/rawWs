@@ -15,7 +15,7 @@ const users: {
 
 let count: number = 0;
 
-wss.on("connection", (ws: WebSocket): void => {
+wss.on("connection", async (ws: WebSocket): Promise<void> => {
   const id = count++;
   ws.on("message", (message: RawData): void => {
     const data = JSON.parse(message.toString());
@@ -33,6 +33,7 @@ wss.on("connection", (ws: WebSocket): void => {
     }
     if (data.type === "message") {
       const roomId = users[id].roomId;
+      const message = data.payload.message;
       RedisManager.getInstance().addChatMessage(roomId, message);
 
       /*

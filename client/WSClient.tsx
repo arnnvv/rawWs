@@ -36,7 +36,7 @@ const WSClient: FC = (): JSX.Element => {
       if (data.type === "message") {
         setMessages((prevMessages: string[]): string[] => [
           ...prevMessages,
-          event.data,
+          JSON.stringify(data.payload),
         ]);
       }
     };

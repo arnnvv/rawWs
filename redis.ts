@@ -67,7 +67,6 @@ class RedisManager {
       console.log(`subscribing message from ${roomId}`);
       this.subscriber.subscribe(roomId, (payload): void => {
         try {
-          console.log(payload);
           const subscribers = this.reverseSubscriptions.get(roomId) || {};
           Object.values(subscribers).forEach(
             ({ ws }: { userId: string; ws: WebSocket }): void =>
@@ -108,7 +107,7 @@ class RedisManager {
     this.publisher.publish(room, JSON.stringify(message));
   }
 
-  addChatMessage(roomId: string, message: RawData): void {
+  async addChatMessage(roomId: string, message: RawData): Promise<void> {
     this.publish(roomId, {
       type: "message",
       payload: {
