@@ -3,9 +3,7 @@ import WebSocket, { RawData, WebSocketServer } from "ws";
 import RedisManager from "./redis";
 
 const port: number = 8080;
-
 const server = http.createServer();
-
 const wss = new WebSocketServer({ server });
 
 const users: {
@@ -52,7 +50,7 @@ wss.on("connection", (ws: WebSocket): void => {
     }
   });
 
-  ws.on("disconnect", () => {
+  ws.on("close", () => {
     RedisManager.getInstance().unsubscribe(id.toString(), users[id].roomId);
   });
 });

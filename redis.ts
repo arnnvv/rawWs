@@ -8,7 +8,12 @@ class RedisManager {
   private subscriptions: Map<string, string[]>;
   private reverseSubscriptions: Map<
     string,
-    { [userId: string]: { userId: string; ws: WebSocket } }
+    {
+      [userId: string]: {
+        userId: string;
+        ws: WebSocket;
+      };
+    }
   >;
 
   private constructor() {
@@ -43,7 +48,10 @@ class RedisManager {
 
     this.reverseSubscriptions.set(roomId, {
       ...(this.reverseSubscriptions.get(roomId) || {}),
-      [userId]: { userId: userId, ws },
+      [userId]: {
+        userId,
+        ws,
+      },
     });
 
     if (
@@ -65,16 +73,18 @@ class RedisManager {
     }
   }
 
-  unsubscribe(userId: string, roomId: string) {
+  unsubscribe(userId: string, roomId: string): void {
     this.subscriptions.set(
       userId,
       this.subscriptions
         .get(userId)
         ?.filter((x: string): boolean => x !== roomId) || [],
     );
+
     if (this.subscriptions.get(userId)?.length === 0) {
       this.subscriptions.delete(userId);
     }
+
     delete this.reverseSubscriptions.get(roomId)?.[userId];
     if (
       !this.reverseSubscriptions.get(roomId) ||
