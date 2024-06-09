@@ -1,5 +1,12 @@
 import { RedisClientType, createClient } from "redis";
-import WebSocket from "ws";
+import WebSocket, { RawData } from "ws";
+
+interface MessageProps {
+  type: string;
+  payload: {
+    message: RawData;
+  };
+}
 
 class RedisManager {
   private static instance: RedisManager;
@@ -60,7 +67,7 @@ class RedisManager {
       console.log(`subscribing message from ${roomId}`);
       this.subscriber.subscribe(roomId, (payload): void => {
         try {
-          // const parsedPayload = JSON.parse(payload);
+          console.log(payload);
           const subscribers = this.reverseSubscriptions.get(roomId) || {};
           Object.values(subscribers).forEach(
             ({ ws }: { userId: string; ws: WebSocket }): void =>
@@ -96,12 +103,12 @@ class RedisManager {
     }
   }
 
-  publish(room: string, message: any): void {
-    console.log(`publishing message to ${room}`);
+  publish(room: string, message: MessageProps): void {
+    console.log(`publishing ${message} to ${room}`);
     this.publisher.publish(room, JSON.stringify(message));
   }
 
-  addChatMessage(roomId: string, message: any): void {
+  addChatMessage(roomId: string, message: RawData): void {
     this.publish(roomId, {
       type: "message",
       payload: {
