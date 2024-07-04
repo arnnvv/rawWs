@@ -1,0 +1,1 @@
+Simplest possible WS implementation

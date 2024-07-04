@@ -1,0 +1,18 @@
+{
+  "name": "dummy",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/ws": "^8.5.10"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
